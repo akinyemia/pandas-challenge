@@ -1,0 +1,58 @@
+district_summary = {'School Name': []
+                        , 'School Type': []
+                        , 'Total Students': []
+                        , 'Total School Budget': []
+                        , 'Per Student Budget': []
+                        , 'Average Math Score': []
+                        , 'Average Reading Score': []
+                        , '% Passing Math': []
+                        , '% Passing Reading': []
+                        , '% Overall Passing': []}
+
+
+# district_summary
+
+for x in range(0, len(schools_list)): 
+    district_summary['School Name'].append(schools_list['school_name'].loc[x])
+    district_summary['School Type'].append(schools_list['type'].loc[x])
+
+    #student count 
+    scount = schools_list['size'].loc[x]
+    district_summary['Total Students'].append(scount)
+    district_summary['Total School Budget'].append(schools_list['budget'].loc[x])
+    district_summary['Per Student Budget'].append(schools_list['budget'].loc[x]/scount)
+    
+    #average math score
+    # ams = school_list_complete['school_name'].where(school_list_complete['school_name'] == 'Thomas High School').count()
+    ams = school_list_complete['math_score'].where(school_list_complete['school_name'] == schools_list['school_name'].loc[x]).mean()
+    district_summary['Average Math Score'].append(ams)
+
+    ars = school_list_complete['math_score'].where(school_list_complete['school_name'] == schools_list['school_name'].loc[x]).mean()                                      
+    # district_summary['Average Reading Score'].append(schools_list['school_name'].loc[x])
+    district_summary['Average Reading Score'].append(ars)
+    
+    #% passing math 
+    # pmc = school_list_complete[school_list_complete['math_score'] >= 70].count()['student_name']
+    pmc = school_list_complete['math_score'].where(school_list_complete['school_name'] == schools_list['school_name'].loc[x]).where(school_list_complete['math_score'] >= 70).count()
+    pmp = pmc/scount*100
+    # district_summary['% Passing Math'].append(schools_list['school_name'].loc[x])
+    district_summary['% Passing Math'].append(pmp)
+
+    #% passing reading 
+    prc = school_list_complete['reading_score'].where(school_list_complete['school_name'] == schools_list['school_name'].loc[x]).where(school_list_complete['reading_score'] >= 70).count()
+    prp = prc/scount*100
+    district_summary['% Passing Reading'].append(prp)
+
+    #% passing reading 
+    opc = school_list_complete['math_score'].where(school_list_complete['school_name'] == schools_list['school_name'].loc[x]).where((school_list_complete["math_score"] >= 70) 
+        & (school_list_complete["reading_score"] >= 70)).count()
+    opp = opc/scount*100
+    district_summary['% Overall Passing'].append(opp)
+
+
+district_summary = pd.DataFrame(district_summary)
+district_summary = district_summary.sort_values(by='School Name')
+district_summary["Total School Budget"] = district_summary["Total School Budget"].map("${:,.2f}".format)
+district_summary["Per Student Budget"] = district_summary["Per Student Budget"].map("${:,.2f}".format)
+
+district_summary
